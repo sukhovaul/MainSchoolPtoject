@@ -1,0 +1,33 @@
+{% extends "lesson_base.html" %}
+
+{% block gesture_content %}
+<div class="video-container">
+    <video width="400" height="300" controls muted autoplay loop>
+        <source src="{{ url_for('static', filename='videos/' + current_gesture.video_filename) }}" type="video/mp4">
+        Ваш браузер не поддерживает видео.
+    </video>
+</div>
+<div class="mt-3">
+    <span class="badge badge-info">Из модуля: {{ current_gesture.module_title }}</span>
+</div>
+{% endblock %}
+
+{% block question_content %}
+<h4 class="text-center mb-4">Вспомните, что означает этот жест:</h4>
+<div class="multiple-choice">
+    {% for option in options %}
+    <div class="answer-option" 
+         onclick="selectAnswer(this, {{ 'true' if option.is_correct else 'false' }})"
+         data-is-correct="{{ 'true' if option.is_correct else 'false' }}">
+        <div class="d-flex justify-content-between align-items-center">
+            <span class="h5 mb-0">{{ option.text }}</span>
+        </div>
+        {% if option.context %}
+        <div class="mt-2">
+            <small class="text-muted">Контекст: {{ option.context }}</small>
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,298 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Заголовок страницы -->
+            <div class="text-center mb-5">
+                <h1 class="display-5 font-weight-bold text-primary mb-3">
+                    <i class="fas fa-book-open mr-3"></i>
+                    Модули обучения
+                </h1>
+            </div>
+
+            <!-- Список модулей -->
+            <div class="modules-container">
+                {% for module in modules %}
+                <div class="module-card mb-5">
+                    <!-- Заголовок модуля -->
+                    <div class="module-header">
+                        <div class="module-icon">
+                            <i class="fas fa-{{ ['hand-rock', 'hands', 'sign-language', 'users', 'comments'][loop.index0 % 5] }}"></i>
+                        </div>
+                        <div class="module-info">
+                            <h2 class="module-title">{{ module.title }}</h2>
+                            {% if module.description %}
+                            <p class="module-description text-muted">{{ module.description }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="module-progress">
+                            <div class="progress-circle" data-progress="{{ module.progress_percentage|default(0) }}">
+                                <span class="progress-text">{{ module.progress_percentage|default(0) }}%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Уроки модуля -->
+                    <div class="lessons-grid">
+                        {% for lesson in module.lessons %}
+                        <div class="lesson-card {{ 'completed' if lesson.completed else 'available' if lesson.available else 'locked' }}"
+                             {% if lesson.available %}onclick="location.href='/lesson/{{ lesson.id }}'"{% endif %}>
+                            
+                            <div class="lesson-icon">
+                                {% if lesson.completed %}
+                                <i class="fas fa-check-circle"></i>
+                                {% elif lesson.available %}
+                                <i class="fas fa-{{ lesson_icons[lesson.lesson_type] }}"></i>
+                                {% else %}
+                                <i class="fas fa-lock"></i>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="lesson-info">
+                                <h4 class="lesson-title">{{ lesson.title }}</h4>
+                                <p class="lesson-type">{{ lesson_types[lesson.lesson_type] }}</p>
+                            </div>
+                            
+                            <div class="lesson-badge">
+                                {% if lesson.completed %}
+                                <span class="badge completed-badge">Пройдено</span>
+                                {% elif lesson.available %}
+                                <span class="badge available-badge">Доступно</span>
+                                {% else %}
+                                <span class="badge locked-badge">Заблокировано</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+
+.text-primary {
+    color: #1E6FA8 !important;
+}
+
+.modules-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.module-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(30, 111, 168, 0.1);
+    border: 1px solid #e8f4ff;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.module-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(30, 111, 168, 0.15);
+}
+
+.module-header {
+    display: flex;
+    align-items: center;
+    padding: 2rem;
+    background: linear-gradient(135deg, #1E6FA8 0%, #2C82C9 100%);
+    color: white;
+}
+
+.module-icon {
+    font-size: 2.5rem;
+    margin-right: 1.5rem;
+    opacity: 0.9;
+}
+
+.module-info {
+    flex: 1;
+}
+
+.module-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.module-description {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-bottom: 0;
+    color: white !important;
+}
+
+.module-progress {
+    margin-left: 1rem;
+}
+
+.progress-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: conic-gradient(#20B2AA var(--progress), #e0e6ed 0deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.progress-circle::before {
+    content: '';
+    position: absolute;
+    width: 70px;
+    height: 70px;
+    background: white;
+    border-radius: 50%;
+}
+
+.progress-text {
+    position: relative;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #1E6FA8;
+}
+
+.lessons-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    padding: 2rem;
+}
+
+.lesson-card {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    border: 2px solid #e8f4ff;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.lesson-card.available {
+    border-color: #1E6FA8;
+    box-shadow: 0 4px 15px rgba(30, 111, 168, 0.1);
+}
+
+.lesson-card.available:hover {
+    border-color: #20B2AA;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(30, 111, 168, 0.15);
+}
+
+.lesson-card.completed {
+    border-color: #20B2AA;
+    background: linear-gradient(135deg, #f8fffe 0%, #f0fffd 100%);
+}
+
+.lesson-card.locked {
+    border-color: #e0e6ed;
+    background-color: #f8f9fa;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.lesson-icon {
+    font-size: 2rem;
+    margin-right: 1rem;
+    width: 50px;
+    text-align: center;
+}
+
+.lesson-card.available .lesson-icon {
+    color: #1E6FA8;
+}
+
+.lesson-card.completed .lesson-icon {
+    color: #20B2AA;
+}
+
+.lesson-card.locked .lesson-icon {
+    color: #6c757d;
+}
+
+.lesson-info {
+    flex: 1;
+}
+
+.lesson-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: #2c3e50;
+}
+
+.lesson-type {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-bottom: 0;
+}
+
+.lesson-badge .badge {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+.completed-badge {
+    background-color: #20B2AA;
+    color: white;
+}
+
+.available-badge {
+    background-color: #1E6FA8;
+    color: white;
+}
+
+.locked-badge {
+    background-color: #6c757d;
+    color: white;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .module-header {
+        flex-direction: column;
+        text-align: center;
+        padding: 1.5rem;
+    }
+    
+    .module-icon {
+        margin-right: 0;
+        margin-bottom: 1rem;
+    }
+    
+    .module-progress {
+        margin-left: 0;
+        margin-top: 1rem;
+    }
+    
+    .lessons-grid {
+        grid-template-columns: 1fr;
+        padding: 1.5rem;
+    }
+}
+</style>
+
+<script>
+// Инициализация кругов прогресса
+document.addEventListener('DOMContentLoaded', function() {
+    const progressCircles = document.querySelectorAll('.progress-circle');
+    progressCircles.forEach(circle => {
+        const progress = circle.getAttribute('data-progress');
+        circle.style.setProperty('--progress', `${progress * 3.6}deg`);
+    });
+});
+</script>
+{% endblock %}

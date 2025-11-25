@@ -1,0 +1,55 @@
+{% extends "lesson_base.html" %}
+
+{% block gesture_content %}
+<div class="video-container">
+    <video width="400" height="300" controls muted autoplay loop>
+        <source src="{{ url_for('static', filename='videos/' + current_gesture.video_filename) }}" type="video/mp4">
+        Ваш браузер не поддерживает видео.
+    </video>
+</div>
+{% endblock %}
+
+{% block question_content %}
+<h4 class="text-center mb-4">Итоговый тест. Выберите правильный перевод:</h4>
+<div class="review-options">
+    {% for option in options %}
+    <div class="answer-option review-option" 
+         onclick="selectAnswer(this, {{ 'true' if option.is_correct else 'false' }})"
+         data-is-correct="{{ 'true' if option.is_correct else 'false' }}">
+        <div class="row align-items-center">
+            <div class="col-1 text-center">
+                <span class="option-number badge badge-light">{{ loop.index }}</span>
+            </div>
+            <div class="col-11">
+                <h5 class="mb-1">{{ option.text }}</h5>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<style>
+.review-option {
+    transition: all 0.3s ease;
+}
+.option-number {
+    font-size: 1rem;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+</style>
+{% endblock %}
+
+{% block next_button %}
+<button class="btn btn-success btn-lg" id="nextBtn" disabled onclick="goToNextQuestion()">
+    {% if current_question == total_questions %}
+    Завершить урок <i class="fas fa-flag-checkered ml-2"></i>
+    {% else %}
+    Следующий вопрос <i class="fas fa-arrow-right ml-2"></i>
+    {% endif %}
+</button>
+{% endblock %}
