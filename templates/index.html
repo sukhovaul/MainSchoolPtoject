@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Герой секция -->
+    <div class="row align-items-center hero-section py-5">
+        <div class="col-lg-8 mx-auto text-center">
+            <div class="hero-icon mb-4">
+                <i class="fas fa-hands-helping"></i>
+            </div>
+            <h1 class="display-4 font-weight-bold mb-4 text-primary">
+                SIGN LANGUAGE TUTOR
+            </h1>
+            <p class="lead mb-4 text-dark">
+                Интерактивная платформа для изучения русского жестового языка. 
+                Современный подход к обучению через практику и визуализацию.
+            </p>
+        </div>
+    </div>
+
+    <!-- Особенности -->
+    <div class="row features-section py-5">
+        <div class="col-12 text-center mb-5">
+            <h2 class="font-weight-bold text-primary">Наши возможности</h2>
+        </div>
+        
+        <div class="col-md-6 mb-4">
+            <div class="feature-card text-center p-4">
+                <div class="feature-icon mb-3">
+                    <i class="fas fa-list-ol"></i>
+                </div>
+                <h4 class="font-weight-bold text-dark">Пошаговые уроки</h4>
+                <p class="text-muted">Постепенное освоение жестов от простых к сложным с повторениями</p>
+            </div>
+        </div>
+        
+        <div class="col-md-6 mb-4">
+            <div class="feature-card text-center p-4">
+                <div class="feature-icon mb-3">
+                    <i class="fas fa-layer-group"></i>
+                </div>
+                <h4 class="font-weight-bold text-dark">Обучение по тематическим модулям</h4>
+                <p class="text-muted">Структурированные курсы по различным темам: бытовое общение, работа, экстренные ситуации и другие</p>
+            </div>
+        </div>
+        
+        <div class="col-md-6 mb-4">
+            <div class="feature-card text-center p-4">
+                <div class="feature-icon mb-3">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h4 class="font-weight-bold text-dark">Отслеживание прогресса</h4>
+                <p class="text-muted">Статистика пройденных модулей</p>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="feature-card text-center p-4">
+                <div class="feature-icon mb-3">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h4 class="font-weight-bold text-dark">База ошибок</h4>
+                <p class="text-muted">База с ошибками пользователя</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- О платформе -->
+    <div class="row about-section py-5 bg-light">
+        <div class="col-lg-8 mx-auto text-center">
+            <div class="about-icon mb-4">
+                <i class="fas fa-comments"></i>
+            </div>
+            <h3 class="font-weight-bold text-primary mb-4">О нашей платформе</h3>
+            <p class="text-muted mb-4">
+                Мы создали современную образовательную платформу для всех, кто хочет 
+                изучить русский жестовый язык. Наша цель - сделать обучение доступным, 
+                интересным и эффективным для каждого.
+            </p>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hero-icon i {
+        font-size: 5rem;
+        color: #20B2AA;
+        margin-bottom: 1rem;
+    }
+    
+    .feature-icon i {
+        font-size: 3rem;
+        color: #20B2AA;
+        margin-bottom: 1rem;
+    }
+    
+    .about-icon i {
+        font-size: 4rem;
+        color: #20B2AA;
+        margin-bottom: 1rem;
+    }
+    
+    .feature-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(30, 111, 168, 0.1);
+        transition: transform 0.3s ease;
+        border: 1px solid #e8f4ff;
+        height: 100%;
+        min-height: 220px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(30, 111, 168, 0.15);
+    }
+    
+    .hero-section {
+        background: linear-gradient(135deg, #f8fdff 0%, #e8f4ff 100%);
+        border-radius: 0 0 30px 30px;
+        margin-bottom: 2rem;
+    }
+    
+    .features-section {
+        background: white;
+    }
+    
+    .about-section {
+        border-radius: 30px 30px 0 0;
+    }
+    
+    .stat-item {
+        padding: 1rem;
+    }
+    
+    .stat-number {
+        color: #1E6FA8 !important;
+    }
+    
+    .text-primary {
+        color: #1E6FA8 !important;
+    }
+    
+    .bg-light {
+        background-color: #f8fdff !important;
+    }
+    
+    .feature-card h4 {
+        min-height: 3rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
+{% endblock %}

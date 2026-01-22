@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+          crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #1E6FA8; /* Темный синий */
+            --secondary-color: #2C82C9; /* Синий */
+            --dark-color: #165A8A; /* Очень темный синий */
+            --light-color: #E8F4FF; /* Светлый синий */
+            --accent-color: #3498DB; /* Акцентный синий */
+        }
+        
+        body {
+            background-color: #f5f9ff;
+            min-height: 100vh;
+        }
+        
+        .navbar {
+            background-color: var(--primary-color) !important;
+            box-shadow: 0 2px 10px rgba(30, 111, 168, 0.3);
+            padding: 0.8rem 1rem;
+        }
+        
+        .navbar-brand {
+            color: white !important;
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+        
+        .navbar-brand:hover {
+            color: var(--light-color) !important;
+            transition: all 0.3s ease;
+        }
+        
+        .logo-icon {
+            color: white;
+            font-size: 2rem;
+            margin-right: 12px;
+        }
+        
+        .nav-item.dropdown .nav-link {
+            color: white !important;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .nav-item.dropdown .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .dropdown-menu {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(30, 111, 168, 0.2);
+            margin-top: 8px;
+            overflow: hidden;
+            min-width: 200px;
+            border: 1px solid #d1e7ff;
+        }
+        
+        .dropdown-item {
+            padding: 0.75rem 1.5rem;
+            color: var(--dark-color);
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .dropdown-item:hover {
+            background-color: var(--light-color);
+            color: var(--secondary-color);
+            border-left-color: var(--primary-color);
+        }
+        
+        .dropdown-item i {
+            width: 20px;
+            margin-right: 10px;
+            color: var(--primary-color);
+        }
+        
+        .dropdown-divider {
+            border-color: #d1e7ff;
+            margin: 0.5rem 0;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            border-radius: 20px;
+            padding: 0.5rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--dark-color);
+            transform: translateY(-1px);
+        }
+        
+        .btn-dark {
+            background-color: var(--dark-color);
+            border: none;
+            border-radius: 20px;
+            padding: 0.5rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-dark:hover {
+            background-color: #13496D;
+            transform: translateY(-1px);
+        }
+        
+        .navbar-toggler {
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-radius: 8px;
+        }
+        
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+        
+        main {
+            padding-bottom: 2rem;
+        }
+        
+        /* Анимация для выпадающего меню */
+        .dropdown-menu.show {
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Дополнительные стили для улучшения внешнего вида */
+        .nav-link.dropdown-toggle::after {
+            margin-left: 8px;
+        }
+        
+        .navbar-nav .btn {
+            margin-left: 8px;
+        }
+    </style>
+    <title>{{title}}</title>
+</head>
+<body>
+<header>
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <!-- Левая часть - иконка и название -->
+        <div class="navbar-brand d-flex align-items-center">
+            <i class="fas fa-hands logo-icon"></i>
+            <span>SIGN LANGUAGE TUTOR</span>
+        </div>
+        
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+            {% if current_user.is_authenticated %}
+                <!-- Выпадающее меню для авторизованного пользователя -->
+                <div class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" 
+                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-user-circle mr-2"></i>
+                        {{ current_user.username }}
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="/profile">
+                            <i class="fas fa-user"></i>Профиль
+                        </a>
+                        <a class="dropdown-item" href="/">
+                            <i class="fas fa-home"></i>Главная
+                        </a>
+                        <a class="dropdown-item" href="/progress">
+                            <i class="fas fa-chart-line"></i>Прогресс
+                        </a>
+                        <a class="dropdown-item" href="/lessons">
+                            <i class="fas fa-book"></i>Уроки
+                        </a>
+                        <a class="dropdown-item" href="/errors">
+                            <i class="fas fa-exclamation-triangle"></i>Ошибки
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="/logout">
+                            <i class="fas fa-sign-out-alt"></i>Выйти
+                        </a>
+                    </div>
+                </div>
+            {% else %}
+                <!-- Кнопки для неавторизованного пользователя -->
+                <div class="navbar-nav">
+                    <a class="btn btn-primary mr-2" href="/register">
+                        <i class="fas fa-user-plus mr-1"></i>Зарегистрироваться
+                    </a>
+                    <a class="btn btn-dark" href="/login">
+                        <i class="fas fa-sign-in-alt mr-1"></i>Войти
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </nav>
+</header>
+
+<!-- Основное содержимое -->
+<main role="main" class="container mt-4">
+    {% block content %}{% endblock %}
+</main>
+
+<!-- Подключение JavaScript для работы выпадающего меню -->
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+        crossorigin="anonymous"></script>
+</body>
+</html>

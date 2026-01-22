@@ -1,0 +1,420 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Заголовок страницы -->
+            <div class="text-center mb-5">
+                <h1 class="display-5 font-weight-bold text-primary mb-3">
+                    <i class="fas fa-chart-line mr-3"></i>
+                    Мой прогресс
+                </h1>
+                <p class="lead text-muted">Отслеживайте ваши успехи в изучении жестового языка</p>
+            </div>
+
+            <!-- Общая статистика -->
+            <div class="row mb-5">
+                <div class="col-md-3 mb-4">
+                    <div class="stat-card text-center">
+                        <div class="stat-icon total-modules">
+                            <i class="fas fa-layer-group"></i>
+                        </div>
+                        <h3 class="stat-number">{{ total_modules }}</h3>
+                        <p class="stat-label">Всего модулей</p>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="stat-card text-center">
+                        <div class="stat-icon completed-modules">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h3 class="stat-number">{{ completed_modules }}</h3>
+                        <p class="stat-label">Пройдено модулей</p>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="stat-card text-center">
+                        <div class="stat-icon total-lessons">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <h3 class="stat-number">{{ total_lessons }}</h3>
+                        <p class="stat-label">Всего уроков</p>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="stat-card text-center">
+                        <div class="stat-icon accuracy">
+                            <i class="fas fa-bullseye"></i>
+                        </div>
+                        <h3 class="stat-number">{{ overall_accuracy }}%</h3>
+                        <p class="stat-label">Общая точность</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Прогресс по модулям -->
+            <div class="progress-section">
+                <h2 class="section-title mb-4">
+                    <i class="fas fa-tasks mr-2"></i>
+                    Прогресс по модулям
+                </h2>
+                
+                <div class="modules-progress">
+                    {% for module in modules_progress %}
+                    <div class="module-progress-card">
+                        <div class="module-header">
+                            <div class="module-info">
+                                <h4 class="module-name">{{ module.title }}</h4>
+                                <p class="module-description text-muted">{{ module.description }}</p>
+                            </div>
+                            <div class="module-stats">
+                                <span class="completion-badge {{ 'completed' if module.is_completed else 'in-progress' }}">
+                                    {{ 'Пройдено' if module.is_completed else 'В процессе' }}
+                                </span>
+                                <div class="accuracy-rate">
+                                    <i class="fas fa-bullseye mr-1"></i>
+                                    {{ module.completion_percentage }}%
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="progress-container">
+                            <div class="progress-labels">
+                                <span>Прогресс</span>
+                                <span>{{ module.completion_percentage }}%</span>
+                            </div>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" style="width: {{ module.completion_percentage }}%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="module-details">
+                            <div class="detail-item">
+                                <i class="fas fa-check-circle text-success"></i>
+                                <span>Правильные ответы: <strong>{{ module.correct_answers }}</strong></span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-question-circle text-primary"></i>
+                                <span>Всего вопросов: <strong>{{ module.total_questions }}</strong></span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-clock text-info"></i>
+                                <span>Последняя активность: <strong>{{ module.last_activity }}</strong></span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Достижения -->
+            <div class="progress-section mt-5">
+                <h2 class="section-title mb-4">
+                    <i class="fas fa-trophy mr-2"></i>
+                    Достижения
+                </h2>
+                <div class="achievements-grid">
+                    <div class="achievement-card {{ 'unlocked' if completed_modules >= 1 else 'locked' }}">
+                        <div class="achievement-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="achievement-info">
+                            <h5>Первый шаг</h5>
+                            <p>Пройдите первый модуль</p>
+                        </div>
+                    </div>
+                    <div class="achievement-card {{ 'unlocked' if completed_modules >= 3 else 'locked' }}">
+                        <div class="achievement-icon">
+                            <i class="fas fa-medal"></i>
+                        </div>
+                        <div class="achievement-info">
+                            <h5>Уверенный старт</h5>
+                            <p>Пройдите 3 модуля</p>
+                        </div>
+                    </div>
+                    <div class="achievement-card {{ 'unlocked' if overall_accuracy >= 80 else 'locked' }}">
+                        <div class="achievement-icon">
+                            <i class="fas fa-bullseye"></i>
+                        </div>
+                        <div class="achievement-info">
+                            <h5>Точность</h5>
+                            <p>Достигните 80% точности</p>
+                        </div>
+                    </div>
+                    <div class="achievement-card {{ 'unlocked' if completed_modules >= 5 else 'locked' }}">
+                        <div class="achievement-icon">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <div class="achievement-info">
+                            <h5>Мастер жестов</h5>
+                            <p>Пройдите 5 модулей</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+
+.text-primary {
+    color: #1E6FA8 !important;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem 1rem;
+    box-shadow: 0 5px 20px rgba(30, 111, 168, 0.1);
+    border: 1px solid #e8f4ff;
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    font-size: 1.8rem;
+}
+
+.stat-icon.total-modules {
+    background: linear-gradient(135deg, #1E6FA8, #2C82C9);
+    color: white;
+}
+
+.stat-icon.completed-modules {
+    background: linear-gradient(135deg, #20B2AA, #32C8C0);
+    color: white;
+}
+
+.stat-icon.total-lessons {
+    background: linear-gradient(135deg, #3498DB, #5DADE2);
+    color: white;
+}
+
+.stat-icon.accuracy {
+    background: linear-gradient(135deg, #9B59B6, #BB8FCE);
+    color: white;
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    color: #6c757d;
+    font-weight: 500;
+    margin-bottom: 0;
+}
+
+.progress-section {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 5px 20px rgba(30, 111, 168, 0.1);
+    border: 1px solid #e8f4ff;
+}
+
+.section-title {
+    color: #1E6FA8;
+    font-weight: 700;
+    border-bottom: 2px solid #e8f4ff;
+    padding-bottom: 1rem;
+}
+
+.module-progress-card {
+    background: #f8fdff;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #e0e6ed;
+    transition: all 0.3s ease;
+}
+
+.module-progress-card:hover {
+    border-color: #1E6FA8;
+    box-shadow: 0 4px 15px rgba(30, 111, 168, 0.1);
+}
+
+.module-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.module-info {
+    flex: 1;
+}
+
+.module-name {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.module-stats {
+    text-align: right;
+}
+
+.completion-badge {
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: inline-block;
+    margin-bottom: 0.5rem;
+}
+
+.completion-badge.completed {
+    background: #20B2AA;
+    color: white;
+}
+
+.completion-badge.in-progress {
+    background: #3498DB;
+    color: white;
+}
+
+.accuracy-rate {
+    color: #6c757d;
+    font-weight: 600;
+}
+
+.progress-container {
+    margin-bottom: 1rem;
+}
+
+.progress-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.progress-bar-bg {
+    height: 10px;
+    background: #e0e6ed;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #1E6FA8, #20B2AA);
+    border-radius: 10px;
+    transition: width 1s ease-in-out;
+}
+
+.module-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+}
+
+.detail-item i {
+    margin-right: 0.5rem;
+    font-size: 1rem;
+}
+
+.achievements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.achievement-card {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    border: 2px solid #e0e6ed;
+    transition: all 0.3s ease;
+}
+
+.achievement-card.unlocked {
+    border-color: #20B2AA;
+    background: linear-gradient(135deg, #f8fffe, #f0fffd);
+}
+
+.achievement-card.locked {
+    opacity: 0.6;
+    background: #f8f9fa;
+}
+
+.achievement-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #1E6FA8;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    font-size: 1.3rem;
+}
+
+.achievement-card.unlocked .achievement-icon {
+    background: #20B2AA;
+}
+
+.achievement-card.locked .achievement-icon {
+    background: #6c757d;
+}
+
+.achievement-info h5 {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: #2c3e50;
+}
+
+.achievement-info p {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-bottom: 0;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .module-header {
+        flex-direction: column;
+    }
+    
+    .module-stats {
+        text-align: left;
+        margin-top: 1rem;
+    }
+    
+    .module-details {
+        grid-template-columns: 1fr;
+    }
+    
+    .achievements-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}

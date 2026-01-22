@@ -1,0 +1,31 @@
+#flask_wtf - модуль для работы с формами
+from flask_wtf import FlaskForm
+from wtforms import BooleanField, PasswordField, StringField, TextAreaField, SubmitField, EmailField
+from wtforms.validators import DataRequired
+from werkzeug.security import generate_password_hash, check_password_hash
+
+
+#класс для работы с формой регистрации
+class RegisterForm(FlaskForm):
+    #Создаем все поля для формы
+    #DataRequired указывает, что обязательно нужно внести данные
+    email = EmailField('Почта', validators=[DataRequired()])
+    password = PasswordField('Пароль', validators=[DataRequired()])
+    password_again = PasswordField('Повторите пароль', validators=[DataRequired()])
+    name = StringField('Имя пользователя', validators=[DataRequired()])
+    about = TextAreaField("Немного о себе")
+    submit = SubmitField('Войти')
+
+    def set_password(self, password):
+        #храним хэшированный пароль(нельзя хранить в открытом виде)
+        self.hashed_password = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.hashed_password, password)
+    
+
+class LoginForm(FlaskForm):
+    email = EmailField('Почта', validators=[DataRequired()])
+    password = PasswordField('Пароль', validators=[DataRequired()])
+    remember_me = BooleanField('Запомнить меня')
+    submit = SubmitField('Войти')
