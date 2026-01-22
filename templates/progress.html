@@ -107,52 +107,6 @@
                     {% endfor %}
                 </div>
             </div>
-
-            <!-- Достижения -->
-            <div class="progress-section mt-5">
-                <h2 class="section-title mb-4">
-                    <i class="fas fa-trophy mr-2"></i>
-                    Достижения
-                </h2>
-                <div class="achievements-grid">
-                    <div class="achievement-card {{ 'unlocked' if completed_modules >= 1 else 'locked' }}">
-                        <div class="achievement-icon">
-                            <i class="fas fa-star"></i>
-                        </div>
-                        <div class="achievement-info">
-                            <h5>Первый шаг</h5>
-                            <p>Пройдите первый модуль</p>
-                        </div>
-                    </div>
-                    <div class="achievement-card {{ 'unlocked' if completed_modules >= 3 else 'locked' }}">
-                        <div class="achievement-icon">
-                            <i class="fas fa-medal"></i>
-                        </div>
-                        <div class="achievement-info">
-                            <h5>Уверенный старт</h5>
-                            <p>Пройдите 3 модуля</p>
-                        </div>
-                    </div>
-                    <div class="achievement-card {{ 'unlocked' if overall_accuracy >= 80 else 'locked' }}">
-                        <div class="achievement-icon">
-                            <i class="fas fa-bullseye"></i>
-                        </div>
-                        <div class="achievement-info">
-                            <h5>Точность</h5>
-                            <p>Достигните 80% точности</p>
-                        </div>
-                    </div>
-                    <div class="achievement-card {{ 'unlocked' if completed_modules >= 5 else 'locked' }}">
-                        <div class="achievement-icon">
-                            <i class="fas fa-crown"></i>
-                        </div>
-                        <div class="achievement-info">
-                            <h5>Мастер жестов</h5>
-                            <p>Пройдите 5 модулей</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </div>

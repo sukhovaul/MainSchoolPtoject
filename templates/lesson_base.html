@@ -4,14 +4,6 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-lg-8">
-            <nav aria-label="breadcrumb" class="mb-4">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="/lessons">Уроки</a></li>
-                    <li class="breadcrumb-item"><a href="#">{{ module_title }}</a></li>
-                    <li class="breadcrumb-item active">{{ lesson_title }}</li>
-                </ol>
-            </nav>
-
             <div class="lesson-header text-center mb-5">
                 <h1 class="display-5 font-weight-bold text-primary">
                     <i class="fas fa-{{ lesson_icon }} mr-3"></i>
@@ -38,15 +30,15 @@
             <div class="lesson-navigation mt-5">
                 <div class="row">
                     <div class="col-6">
-                        <button class="btn btn-outline-primary btn-lg" onclick="history.back()">
-                            <i class="fas fa-arrow-left mr-2"></i>Назад
+                        <button class="btn btn-outline-primary btn-lg" onclick="window.location.href='/lessons'">
+                            <i class="fas fa-arrow-left mr-2"></i>К урокам
                         </button>
                     </div>
                     <div class="col-6 text-right">
                         {% block next_button %}
                         <button class="btn btn-primary btn-lg" id="nextBtn" disabled onclick="goToNextQuestion()">
                             {% if current_question == total_questions %}
-                            Завершить урок
+                            Завершить и вернуться к урокам
                             {% else %}
                             Следующий вопрос
                             {% endif %}
@@ -82,16 +74,14 @@
 }
 
 .answer-option.incorrect {
-    border-color: #6c757d;
-    background-color: #6c757d;
-    color: white;
-    cursor: not-allowed;
+    border-color: #dc3545;
+    background-color: #f8d7da;
+    color: #721c24;
 }
 
 .answer-option.disabled {
     cursor: not-allowed;
     opacity: 0.6;
-    pointer-events: none;
 }
 
 #nextBtn:disabled {
@@ -99,7 +89,6 @@
     opacity: 0.6;
 }
 </style>
-
 <script>
 let answered = false;
 
@@ -108,6 +97,9 @@ function selectAnswer(element, isCorrect) {
     
     answered = true;
     
+    // Получаем текст выбранного ответа
+    const selectedText = element.querySelector('h5')?.textContent || element.textContent;
+    
     // Блокируем все варианты
     const allOptions = document.querySelectorAll('.answer-option');
     allOptions.forEach(opt => {
@@ -115,44 +107,58 @@ function selectAnswer(element, isCorrect) {
         opt.classList.add('disabled');
     });
     
-    // Активируем кнопку "Следующий вопрос" ВСЕГДА, независимо от правильности ответа
+    // Активируем кнопку
     document.getElementById('nextBtn').disabled = false;
     
     if (isCorrect) {
-        // Правильный ответ
         element.classList.add('correct');
+        saveAnswer(true, selectedText);
     } else {
-        // Неправильный ответ
         element.classList.add('incorrect');
         
-        // Находим и подсвечиваем правильный ответ
+        // Находим правильный ответ
         allOptions.forEach(opt => {
-            if (opt.getAttribute('data-correct') === 'true') {
+            if (opt.getAttribute('data-is-correct') === 'true') {
                 opt.classList.add('correct');
             }
         });
+        
+        saveAnswer(false, selectedText);
     }
 }
 
+function saveAnswer(isCorrect, selectedAnswer) {
+    // Отправляем ответ на сервер
+    fetch('/save_answer', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            lesson_id: {{ lesson_id }},
+            gesture_id: {{ current_gesture.gesture_id }},
+            is_correct: isCorrect,
+            selected_answer: selectedAnswer  // Отправляем выбранный ответ
+        })
+    }).then(response => response.json())
+    .then(data => {
+        console.log('Ответ сохранен:', data);
+    }).catch(error => {
+        console.error('Ошибка при сохранении ответа:', error);
+    });
+}
+
 function goToNextQuestion() {
-    {% if next_question_url %}
-    window.location.href = "{{ next_question_url }}";
+    // Если это последний вопрос
+    {% if current_question == total_questions %}
+        // Переходим на страницу завершения урока
+        window.location.href = "/finish_lesson/{{ lesson_id }}";
+    {% else %}
+        window.location.href = "{{ next_question_url }}";
     {% endif %}
 }
 
-// Инициализация при загрузке страницы
-document.addEventListener('DOMContentLoaded', function() {
-    // Проставляем data-атрибуты для правильных ответов
-    const options = document.querySelectorAll('.answer-option');
-    options.forEach(option => {
-        const isCorrect = option.getAttribute('data-is-correct') === 'true';
-        if (isCorrect) {
-            option.setAttribute('data-correct', 'true');
-        }
-    });
-});
-
-// Разрешаем нажатие Enter для перехода к следующему вопросу
+// Разрешаем Enter для перехода
 document.addEventListener('keydown', function(event) {
     if (event.key === 'Enter' && !document.getElementById('nextBtn').disabled) {
         goToNextQuestion();
