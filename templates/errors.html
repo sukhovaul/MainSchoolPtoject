@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Заголовок страницы -->
+            <div class="text-center mb-5">
+                <h1 class="display-5 font-weight-bold text-primary mb-3">
+                    <i class="fas fa-exclamation-triangle mr-3"></i>
+                    Мои ошибки
+                </h1>
+                <p class="lead text-muted">Анализируйте и работайте над своими ошибками</p>
+            </div>
+
+            {% if mistakes %}
+            <div class="mistakes-list">
+                {% for mistake in mistakes %}
+                <div class="mistake-card mb-4">
+                    <div class="card border-left-danger shadow-sm">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <div class="mb-3">
+                                        <span class="badge badge-danger badge-pill mr-2">
+                                            <i class="fas fa-times"></i> Ошибка
+                                        </span>
+                                        <span class="badge badge-info badge-pill">
+                                            Повторений: {{ mistake.mistake_count }}
+                                        </span>
+                                    </div>
+                                    <h4 class="card-title text-primary">
+                                        Жест: <strong>{{ mistake.gesture_word }}</strong>
+                                    </h4>
+                                    <p class="card-text">
+                                        <i class="fas fa-times-circle text-danger mr-2"></i>
+                                        Ваш ответ: <strong class="text-danger">{{ mistake.incorrect_answer }}</strong>
+                                    </p>
+                                    <div class="mt-3">
+                                        <a href="/lessons" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-redo mr-1"></i> Повторить урок
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-right">
+                                    <div class="mistake-statistics">
+                                        <div class="stat-item mb-2">
+                                            <small class="text-muted">Частота ошибок</small>
+                                            <div class="progress" style="height: 8px;">
+                                                <div class="progress-bar bg-danger" 
+                                                     style="width: {{ [mistake.mistake_count * 10, 100]|min }}%">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="text-center mt-5">
+                <a href="/lessons" class="btn btn-primary btn-lg">
+                    <i class="fas fa-book mr-2"></i> Вернуться к урокам
+                </a>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <div class="empty-state">
+                    <i class="fas fa-check-circle fa-5x text-success mb-4"></i>
+                    <h3 class="text-success mb-3">Отличная работа!</h3>
+                    <p class="lead text-muted mb-4">У вас пока нет ошибок. Продолжайте в том же духе!</p>
+                    <a href="/lessons" class="btn btn-primary btn-lg">
+                        <i class="fas fa-play mr-2"></i> Продолжить обучение
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.mistake-card {
+    transition: transform 0.3s ease;
+}
+
+.mistake-card:hover {
+    transform: translateY(-2px);
+}
+
+.border-left-danger {
+    border-left: 4px solid #e74c3c !important;
+}
+
+.empty-state {
+    background: white;
+    border-radius: 20px;
+    padding: 3rem;
+    box-shadow: 0 5px 20px rgba(30, 111, 168, 0.1);
+}
+
+.text-danger {
+    color: #e74c3c !important;
+}
+
+.text-success {
+    color: #20B2AA !important;
+}
+
+.badge-danger {
+    background-color: #e74c3c !important;
+}
+
+.progress {
+    background-color: #f5f5f5;
+    border-radius: 10px;
+}
+
+.progress-bar {
+    border-radius: 10px;
+}
+</style>
+{% endblock %}
