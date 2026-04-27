@@ -46,22 +46,40 @@ def register():
     if form.validate_on_submit():
         if form.password.data != form.password_again.data:
             return render_template('register.html', title='Регистрация', form=form, message='Пароли не совпадают')
+        
         db_sess = db_session.create_session()
         try:
             if db_sess.query(User).filter(User.email == form.email.data).first():
                 return render_template('register.html', title='Регистрация',
                                        form=form,
                                        message="Такой пользователь уже есть")
+            
+            # --- НОВЫЙ БЛОК: Обработка TXT файла ---
+            about_text = form.about.data  # берем текст из TextArea по умолчанию
+            
+            if form.about_file.data:  # если файл был выбран
+                file = form.about_file.data
+                try:
+                    # Читаем содержимое, декодируем из байтов в строку
+                    content = file.read().decode('utf-8')
+                    # Если файл не пустой, используем его содержимое вместо текста из формы
+                    if content.strip():
+                        about_text = content
+                except Exception as e:
+                    return render_template('register.html', title='Регистрация', 
+                                           form=form, message='Ошибка при чтении файла')
+            # ---------------------------------------
+
             user = User(
                 username=form.name.data,
                 email=form.email.data,
-                about=form.about.data
+                about=about_text  # передаем итоговый текст (из файла или из TextArea)
             )
             user.set_password(form.password.data)
             db_sess.add(user)
             db_sess.commit()
             
-            # Создаем начальный прогресс для пользователя
+            # Создаем начальный прогресс
             modules = db_sess.query(Module).all()
             for module in modules:
                 progress = UserProgress(
@@ -74,11 +92,7 @@ def register():
                 )
                 db_sess.add(progress)
                 
-                # НЕ создаем запись UserLesson для первого урока
-                # Запись создастся только когда пользователь начнет урок
-                
             db_sess.commit()
-            
             login_user(user)
             return redirect('/')
         finally:
@@ -103,7 +117,6 @@ def login():
     return render_template('login.html', title='Авторизация', form=form)
 
 def get_lesson_status(user_id, lesson_id):
-    """Проверяет статус урока: пройден, доступен, заблокирован"""
     db_sess = db_session.create_session()
     try:
         # Получаем урок
@@ -281,7 +294,7 @@ def progress():
                     Lesson.module_id == module.id
                 ).count()
                 
-                # Пересчитываем процент завершения (25% за каждый урок)
+                # Пересчитываем процент завершения 
                 if progress and not progress.is_completed:
                     progress_per_lesson = 100.0 / total_lessons_in_module
                     progress.completion_percentage = min(100.0, completed_lessons_in_module * progress_per_lesson)
@@ -427,7 +440,6 @@ def lesson(lesson_id):
 @app.route('/finish_lesson/<int:lesson_id>')
 @login_required
 def finish_lesson(lesson_id):
-    """Завершает урок и открывает доступ к следующему уроку"""
     db_sess = db_session.create_session()
     try:
         # Получаем урок
@@ -521,7 +533,6 @@ def finish_lesson(lesson_id):
 @app.route('/errors')
 @login_required
 def errors():
-    """Страница с ошибками пользователя"""
     db_sess = db_session.create_session()
     
     mistakes = db_sess.query(UserMistake).filter(
@@ -544,7 +555,6 @@ def errors():
                           mistakes=mistakes_data)
 
 def save_mistake(user_id, gesture_id, lesson_id, incorrect_answer):
-    """Сохраняет ошибку пользователя"""
     db_sess = db_session.create_session()
     try:
         # Проверяем, есть ли уже такая ошибка
@@ -584,10 +594,27 @@ def save_mistake(user_id, gesture_id, lesson_id, incorrect_answer):
     finally:
         db_sess.close()
 
+@app.route('/api/modules', methods=['GET'])
+def get_modules():
+    db_sess = db_session.create_session()
+    # Получаем все модули из базы
+    modules = db_sess.query(Module).all()
+    
+    # Преобразуем объекты SQLAlchemy в список словарей
+    results = []
+    for module in modules:
+        results.append({
+            'id': module.id,
+            'name': module.title,
+            'description': getattr(module, 'description', '') # если есть описание
+        })
+    
+    db_sess.close()
+    return jsonify(results) # Flask преобразует это в JSON-ответ
+
 @app.route('/save_answer', methods=['POST'])
 @login_required
 def save_answer():
-    """Сохраняет ответ пользователя и ошибки если есть"""
     try:
         data = request.get_json()
         if not data:
@@ -596,7 +623,7 @@ def save_answer():
         lesson_id = data.get('lesson_id')
         gesture_id = data.get('gesture_id')
         is_correct = data.get('is_correct')
-        selected_answer = data.get('selected_answer')  # Добавь это поле в JavaScript
+        selected_answer = data.get('selected_answer')
         
         db_sess = db_session.create_session()
         
@@ -677,4 +704,4 @@ def logout():
     return redirect("/")
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    app.run(port = '8080', host='0.0.0.0')
