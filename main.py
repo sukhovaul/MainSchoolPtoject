@@ -15,71 +15,85 @@ import random
 from datetime import datetime
 
 
+# Инициализация базы данных (создание соединения с файлом базы)
 db_session.global_init("db/app.db")
 
 app = Flask(__name__)
+# Секретный ключ необходим для защиты сессий и работы Flask-WTF (защита от CSRF-атак)
 app.config['SECRET_KEY'] = '65432456uijhgfdsxcvbn'
+
+# Настройка менеджера авторизации пользователей
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-
+# Функция для загрузки пользователя из базы данных по его ID (нужна для Flask-Login)
 @login_manager.user_loader
 def load_user(user_id):
     db_sess = db_session.create_session()
     try:
+        # Ищем пользователя в таблице User по первичному ключу
         return db_sess.query(User).get(int(user_id))
     finally:
         db_sess.close()
 
+# Главная страница приложения
 @app.route("/")
 def index():
     return render_template("index.html", title='')
 
+# Страница личного кабинета (доступна только авторизованным пользователям)
 @app.route('/profile')
-@login_required
+@login_required  # Декоратор, который перенаправляет на логин, если пользователь не вошел
 def profile():
     return render_template('profile.html', title='Профиль')
 
+# Регистрация нового пользователя
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
+    # Проверка, была ли форма отправлена и прошла ли она валидацию (заполнение полей)
     if form.validate_on_submit():
+        # Проверка на совпадение паролей
         if form.password.data != form.password_again.data:
             return render_template('register.html', title='Регистрация', form=form, message='Пароли не совпадают')
         
         db_sess = db_session.create_session()
         try:
+            # Проверка, не занят ли данный email в системе
             if db_sess.query(User).filter(User.email == form.email.data).first():
                 return render_template('register.html', title='Регистрация',
                                        form=form,
                                        message="Такой пользователь уже есть")
             
-            # --- НОВЫЙ БЛОК: Обработка TXT файла ---
-            about_text = form.about.data  # берем текст из TextArea по умолчанию
+            # --- ЛОГИКА ОБРАБОТКИ TXT ФАЙЛА ---
+            # По умолчанию берем текст «О себе», введенный вручную
+            about_text = form.about.data 
             
-            if form.about_file.data:  # если файл был выбран
+            # Если в форму был загружен файл, считываем его содержимое
+            if form.about_file.data:
                 file = form.about_file.data
                 try:
-                    # Читаем содержимое, декодируем из байтов в строку
+                    # Декодируем байты файла в строку (UTF-8)
                     content = file.read().decode('utf-8')
-                    # Если файл не пустой, используем его содержимое вместо текста из формы
                     if content.strip():
-                        about_text = content
+                        about_text = content  # Файл имеет приоритет над ручным вводом
                 except Exception as e:
                     return render_template('register.html', title='Регистрация', 
                                            form=form, message='Ошибка при чтении файла')
-            # ---------------------------------------
+            # ---------------------------------
 
+            # Создание объекта пользователя и хеширование пароля
             user = User(
                 username=form.name.data,
                 email=form.email.data,
-                about=about_text  # передаем итоговый текст (из файла или из TextArea)
+                about=about_text
             )
-            user.set_password(form.password.data)
+            user.set_password(form.password.data) # Пароль сохраняется в виде хеша для безопасности
             db_sess.add(user)
-            db_sess.commit()
+            db_sess.commit() # Сохраняем пользователя, чтобы получить его ID
             
-            # Создаем начальный прогресс
+            # --- ИНИЦИАЛИЗАЦИЯ ПРОГРЕССА ОБУЧЕНИЯ ---
+            # Создаем записи в таблице прогресса для всех существующих модулей
             modules = db_sess.query(Module).all()
             for module in modules:
                 progress = UserProgress(
@@ -91,24 +105,32 @@ def register():
                     is_completed=False
                 )
                 db_sess.add(progress)
-                
-            db_sess.commit()
+            
+            db_sess.commit() # Финальное сохранение всех данных
+            
+            # Автоматический вход в систему после успешной регистрации
             login_user(user)
             return redirect('/')
         finally:
             db_sess.close()
     return render_template('register.html', title='Регистрация', form=form)
 
+# Авторизация (вход) пользователя
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
         db_sess = db_session.create_session()
         try:
+            # Ищем пользователя по почте
             user = db_sess.query(User).filter(User.email == form.email.data).first()
+            # Проверяем существование пользователя и правильность введенного хеша пароля
             if user and user.check_password(form.password.data):
+                # Вход в сессию, флаг remember определяет, нужно ли хранить куки долго
                 login_user(user, remember=form.remember_me.data)
                 return redirect("/")
+            
+            # Ошибка, если данные неверны
             return render_template('login.html',
                                    message="Неправильный логин или пароль",
                                    form=form)
